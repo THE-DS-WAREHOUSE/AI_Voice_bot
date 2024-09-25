@@ -1,0 +1,4 @@
+"Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+" -- run this on PowerShell if you are on windows
+-- if you are using iOS just use "brew" instead of "choco"
+Y mpv -y
