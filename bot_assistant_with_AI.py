@@ -29,7 +29,7 @@ class Assistant:  # AI assistant class
         )
         self.transcriber.connect()  # activate transcriber
         microphone_steam = aai.extras.MicrophoneStream(sample_rate=16000)  # capture audio from the microphone
-        self.transcriber.stream(microphone_steam)  # begins the process of streaming audio data from the microphone
+        self.transcriber.stream(microphone_steam)  # begins the process of streaming audio from the microphone
 
     def stop_transcription(self):  # stop transcription
         if self.transcriber:  # if we have a transcriber active then
