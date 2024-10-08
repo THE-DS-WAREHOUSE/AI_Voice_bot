@@ -11,12 +11,20 @@ class Assistant:  # AI assistant class
         self.elevenlabs_api_key = os.environ['ELEVEN_LABS_API_KEY']  # initialize elevenlabs api key
 
         self.transcriber = None  # empty transcriber object
+        self.reservation = False
 
         # Prompt before the conversation
         self.full_transcript = [
-            {'role': "system",  # set content/context to the transcript AI
+            {'role': "system",  # set content/context to the transcript AI (set as you like)
              "content": "You are a receptionist at a famous restaurant in New York called 'Happy Meat'. Be kind, "
-                        "efficient, and polite."}
+                        "efficient, and polite."
+                        """Always ask for: 
+                        1. Day to make reservation and time (remember restaurant is open all week but only 
+                        from 12:00 pm to 10:00 pm)
+                        2. Name to reserve
+                        3. Phone number to contact
+                        3. Number on people to reserve for (including customer
+                        """}
         ]
 
     def start_transcription(self):  # start transcription
@@ -64,16 +72,24 @@ class Assistant:  # AI assistant class
         self.full_transcript.append({"role": "user", "content": transcript.text})  # ww add transcription to context
         print(f"\nCustomer: {transcript.text}", end="\r\n")  # print it
 
-        response = self.openai.chat.completions.create(  # now we create a response using chatGPT
-            model="gpt-3.5-turbo",  # model
-            messages=self.full_transcript,  # prompt is our transcript
-        )
+        # Check for booking keywords
+        if "bye" in transcript.text.lower() or "goodbye" in transcript.text.lower():  # check if customers
+            # wants to leave
+            self.reservation = True # if reservation is made then True
+            self.stop_transcription() # Ensure transcription is stopped at exit
+            print("Exiting program...")
 
-        ai_response = response.choices[0].message.content  # we take the response
+        else:
+            response = self.openai.chat.completions.create(  # now we create a response using chatGPT
+                model="gpt-3.5-turbo",  # model
+                messages=self.full_transcript,  # prompt is our transcript
+            )
 
-        self.generate_audio(ai_response)  # now we generate audio for the response using Eleven Labs
+            ai_response = response.choices[0].message.content  # we take the response
 
-        self.start_transcription()  # and we start for another transcription
+            self.generate_audio(ai_response)  # now we generate audio for the response using Eleven Labs
+
+            self.start_transcription()  # and we start for another transcription
 
     def generate_audio(self, text):  # generate audio
         self.full_transcript.append({"role": "assistant", "content": text})  # use response generated as content
@@ -89,9 +105,18 @@ class Assistant:  # AI assistant class
 
         stream(audio_stream)  # stream audio
 
+    def end_session(self):
+        print("\nThank you for your reservation. Have a great day!")
+        self.stop_transcription()  # Stop transcription
+        print("stopped transcription")
+        # Optionally, perform any cleanup or logging here
 
-greeting = (
-    "Thank you for calling 'Happy Meat', the best steakhouse in New York. My name is Rachel, how can I help you?")
-ai_assistant = Assistant()
-ai_assistant.generate_audio(greeting)
-ai_assistant.start_transcription()
+    def run(self):
+        greeting = ("Thank you for calling 'Happy Meat', the best steakhouse in New York. My name is Rachel, how can I "
+                    "help you?")
+        self.generate_audio(greeting)
+        self.start_transcription()
+
+
+ai_assistant = Assistant()  # initialize Assistant
+ai_assistant.run()  # start run
