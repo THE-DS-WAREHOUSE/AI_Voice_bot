@@ -1,6 +1,3 @@
-Here is a custom README.md file tailored specifically to your AI restaurant receptionist project. You can copy and paste this directly into your project folder.
-
-Markdown
 # Happy Meat AI Receptionist
 
 A real-time, voice-activated AI assistant designed to act as a receptionist for a fictional New York steakhouse called "Happy Meat." 
